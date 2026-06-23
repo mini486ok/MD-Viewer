@@ -520,8 +520,9 @@
       paraPr(PP.TD_CENTER, { align: 'CENTER', line: 145 }) +
       paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 145 }) +
       paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 320, next: 320, bf: BF.HR }) +
-      paraPr(PP.H1, { align: 'LEFT', line: 150, prev: 820, next: 520, bf: BF.H1_UL, borderOffsetBottom: 300 }) +
-      paraPr(PP.H2, { align: 'LEFT', line: 152, prev: 660, next: 440, bf: BF.H2_UL, borderOffsetBottom: 230 });
+      // 밑줄은 제목 글자에 가깝게(borderOffsetBottom 작게), 내용은 밑줄에서 넉넉히 띄움(next 크게)
+      paraPr(PP.H1, { align: 'LEFT', line: 150, prev: 820, next: 720, bf: BF.H1_UL, borderOffsetBottom: 300 }) +
+      paraPr(PP.H2, { align: 'LEFT', line: 152, prev: 660, next: 600, bf: BF.H2_UL, borderOffsetBottom: 250 });
     var paraProps = '<hh:paraProperties itemCnt="32">' + baseParas + extParas + '</hh:paraProperties>';
 
     return HEADER_PREFIX + borderFills + charProps + HEADER_MID + paraProps + HEADER_SUFFIX;
