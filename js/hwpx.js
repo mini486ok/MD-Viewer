@@ -29,10 +29,11 @@
   var PP = {
     BODY: 0, HEADING: 20, CODE: 21, QUOTE: 22,
     LIST1: 23, LIST2: 24, LIST3: 25,
-    TD_LEFT: 26, TD_CENTER: 27, TD_RIGHT: 28, HR: 29
+    TD_LEFT: 26, TD_CENTER: 27, TD_RIGHT: 28, HR: 29,
+    H1: 30, H2: 31   // 밑줄(하단 테두리) 포함 제목용
   };
   // BorderFill ID 맵
-  var BF = { NONE: 2, CELL: 3, TH: 4, CODE: 5, HR: 6 };
+  var BF = { NONE: 2, CELL: 3, TH: 4, CODE: 5, HR: 6, H1_UL: 7, H2_UL: 8 };
 
   var HEAD_CP = [CP.H1, CP.H2, CP.H3, CP.H4, CP.H5, CP.H6];
 
@@ -172,7 +173,8 @@
   // ──────────────────────────────────────────────────────────────────────────
   function renderHeading(t) {
     var depth = Math.min(Math.max(t.depth || 1, 1), 6);
-    return para(PP.HEADING, inlineRuns(t.tokens, { fixed: HEAD_CP[depth - 1] }));
+    var ppr = depth === 1 ? PP.H1 : depth === 2 ? PP.H2 : PP.HEADING;
+    return para(ppr, inlineRuns(t.tokens, { fixed: HEAD_CP[depth - 1] }));
   }
 
   function listParaPr(depth) {
@@ -394,12 +396,13 @@
       '</hh:charPr>';
   }
 
-  function borderFill(id, sides, fillColor) {
-    // sides: { l,r,t,b } each true(SOLID) / false(NONE)
+  function borderFill(id, sides, fillColor, opts) {
+    // sides: { l,r,t,b } each true(SOLID) / false(NONE). opts: { width, color }
+    opts = opts || {};
     function bd(name, on, w, color) {
       return '<hh:' + name + ' type="' + (on ? 'SOLID' : 'NONE') + '" width="' + w + '" color="' + color + '"/>';
     }
-    var w = '0.12 mm', col = '#BBBBBB';
+    var w = opts.width || '0.12 mm', col = opts.color || '#BBBBBB';
     var xml = '<hh:borderFill id="' + id + '" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">' +
       '<hh:slash type="NONE" Crooked="0" isCounter="0"/>' +
       '<hh:backSlash type="NONE" Crooked="0" isCounter="0"/>' +
@@ -421,6 +424,7 @@
     var line = opts.line || 160;
     var left = opts.left || 0, intent = opts.intent || 0, prev = opts.prev || 0, next = opts.next || 0;
     var bf = opts.bf != null ? opts.bf : 2;
+    var ob = opts.borderOffsetBottom || 0;
     function margins(mult) {
       return '<hh:margin>' +
         '<hc:intent value="' + (intent * mult) + '" unit="HWPUNIT"/>' +
@@ -440,7 +444,7 @@
       '<hp:case hp:required-namespace="http://www.hancom.co.kr/hwpml/2016/HwpUnitChar">' + margins(1) + '</hp:case>' +
       '<hp:default>' + margins(2) + '</hp:default>' +
       '</hp:switch>' +
-      '<hh:border borderFillIDRef="' + bf + '" offsetLeft="0" offsetRight="0" offsetTop="0" offsetBottom="0" connect="0" ignoreMargin="0"/>' +
+      '<hh:border borderFillIDRef="' + bf + '" offsetLeft="0" offsetRight="0" offsetTop="0" offsetBottom="' + ob + '" connect="0" ignoreMargin="0"/>' +
       '</hh:paraPr>';
   }
 
@@ -485,36 +489,40 @@
       '<hh:topBorder type="NONE" width="0.1 mm" color="#000000"/><hh:bottomBorder type="NONE" width="0.1 mm" color="#000000"/>' +
       '<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>' +
       '<hc:fillBrush><hc:winBrush faceColor="none" hatchColor="#999999" alpha="0"/></hc:fillBrush></hh:borderFill>';
-    var borderFills = '<hh:borderFills itemCnt="6">' + bf1 + bf2 +
+    var borderFills = '<hh:borderFills itemCnt="8">' + bf1 + bf2 +
       borderFill(BF.CELL, { l: true, r: true, t: true, b: true }, null) +
       borderFill(BF.TH, { l: true, r: true, t: true, b: true }, '#EEF1F5') +
       borderFill(BF.CODE, { l: true, r: true, t: true, b: true }, '#F6F8FA') +
       borderFill(BF.HR, { l: false, r: false, t: false, b: true }, null) +
+      borderFill(BF.H1_UL, { l: false, r: false, t: false, b: true }, null, { width: '0.4 mm', color: '#2E2E2E' }) +
+      borderFill(BF.H2_UL, { l: false, r: false, t: false, b: true }, null, { width: '0.15 mm', color: '#C8CDD3' }) +
       '</hh:borderFills>';
 
     // base paraPr 0~19 는 별도 정의가 필요 없으나, 본문은 0 만 사용.
     // 단순화를 위해 base paraPr 0~19 중 본 모듈이 참조하는 0 만 base 동일하게 두고,
     // 나머지(1~19)도 형태 유지를 위해 생성한다(스타일 참조 정합성 유지).
     var baseParas = '';
-    // paraPr 0: 본문 기본
-    baseParas += paraPr(0, { align: 'JUSTIFY', line: 160 });
+    // paraPr 0: 본문 기본 — 줄간격 175%, 문단 뒤 여백(읽기 편한 리듬)
+    baseParas += paraPr(0, { align: 'JUSTIFY', line: 175, next: 250 });
     // 1~19: base 와 동일 의미를 갖도록 최소 형태로 생성(미사용이지만 styles 참조 충족)
     for (var p = 1; p <= 19; p++) {
       baseParas += paraPr(p, { align: 'JUSTIFY', line: 160 });
     }
-    // 확장 20~29
+    // 확장 20~31
     var extParas =
-      paraPr(PP.HEADING, { align: 'LEFT', line: 160, prev: 500, next: 200 }) +
-      paraPr(PP.CODE, { align: 'LEFT', line: 130 }) +
-      paraPr(PP.QUOTE, { align: 'JUSTIFY', line: 160, left: 600, prev: 50, next: 50 }) +
-      paraPr(PP.LIST1, { align: 'JUSTIFY', line: 160, left: 700, intent: -350 }) +
-      paraPr(PP.LIST2, { align: 'JUSTIFY', line: 160, left: 1400, intent: -350 }) +
-      paraPr(PP.LIST3, { align: 'JUSTIFY', line: 160, left: 2100, intent: -350 }) +
-      paraPr(PP.TD_LEFT, { align: 'LEFT', line: 130 }) +
-      paraPr(PP.TD_CENTER, { align: 'CENTER', line: 130 }) +
-      paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 130 }) +
-      paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 150, next: 150, bf: BF.HR });
-    var paraProps = '<hh:paraProperties itemCnt="30">' + baseParas + extParas + '</hh:paraProperties>';
+      paraPr(PP.HEADING, { align: 'LEFT', line: 150, prev: 450, next: 160 }) +          // H3~H6
+      paraPr(PP.CODE, { align: 'LEFT', line: 135 }) +
+      paraPr(PP.QUOTE, { align: 'JUSTIFY', line: 165, left: 700, prev: 100, next: 130 }) +
+      paraPr(PP.LIST1, { align: 'JUSTIFY', line: 165, left: 700, intent: -350, next: 60 }) +
+      paraPr(PP.LIST2, { align: 'JUSTIFY', line: 165, left: 1400, intent: -350, next: 60 }) +
+      paraPr(PP.LIST3, { align: 'JUSTIFY', line: 165, left: 2100, intent: -350, next: 60 }) +
+      paraPr(PP.TD_LEFT, { align: 'LEFT', line: 135 }) +
+      paraPr(PP.TD_CENTER, { align: 'CENTER', line: 135 }) +
+      paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 135 }) +
+      paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 250, next: 250, bf: BF.HR }) +
+      paraPr(PP.H1, { align: 'LEFT', line: 140, prev: 650, next: 260, bf: BF.H1_UL, borderOffsetBottom: 200 }) +
+      paraPr(PP.H2, { align: 'LEFT', line: 145, prev: 520, next: 210, bf: BF.H2_UL, borderOffsetBottom: 150 });
+    var paraProps = '<hh:paraProperties itemCnt="32">' + baseParas + extParas + '</hh:paraProperties>';
 
     return HEADER_PREFIX + borderFills + charProps + HEADER_MID + paraProps + HEADER_SUFFIX;
   }

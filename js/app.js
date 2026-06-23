@@ -527,15 +527,18 @@
     showOverlay('PDF 만드는 중… 문서가 길면 시간이 걸릴 수 있습니다.');
 
     withLightTheme(function () {
+      var PAGE_W = 800; // 캡처 폭(px). 모든 콘텐츠를 이 폭 안에 맞춰 우측 잘림 방지
       var holder = document.createElement('div');
-      holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:794px;background:#fff;';
+      // 화면 밖(left:-99999px)에 두면 html2canvas가 x오프셋을 잘못 잡아 좌측이 잘림 →
+      // 좌상단에 두되 진행 오버레이(z-index 70)로 가린다.
+      holder.style.cssText = 'position:fixed;left:0;top:0;z-index:1;width:' + PAGE_W + 'px;background:#fff;';
       holder.className = 'pdf-rendering';
       var page = document.createElement('div');
       page.className = 'markdown-body';
-      page.style.cssText = 'width:794px;padding:48px 52px;background:#fff;color:#1f2328;font-size:14.5px;line-height:1.75;box-sizing:border-box;';
+      page.style.cssText = 'width:' + PAGE_W + 'px;padding:0;background:#fff;color:#1f2328;font-size:15px;line-height:1.75;box-sizing:border-box;';
 
       var head = document.createElement('div');
-      head.style.cssText = 'margin-bottom:20px;padding-bottom:12px;border-bottom:1.5px solid #222;';
+      head.style.cssText = 'margin:0 0 20px;padding-bottom:12px;border-bottom:1.5px solid #222;';
       head.innerHTML = '<div style="font-size:21px;font-weight:800;letter-spacing:-.02em;"></div>' +
         '<div style="font-size:11px;color:#666;margin-top:5px;">Markdown 뷰어 · ' + formatDate(new Date()) + '</div>';
       head.querySelector('div').textContent = baseName(f.name);
@@ -546,14 +549,14 @@
       holder.appendChild(page);
       document.body.appendChild(holder);
 
-      var scale = isMobile() ? 1.3 : (window.devicePixelRatio > 1 ? 2 : 1.6);
+      var scale = isMobile() ? 1.5 : 2;
       var opt = {
-        margin: [10, 0, 12, 0],
+        margin: [13, 13, 14, 13],   // 상우하좌(mm) 대칭 여백 → 중앙 배치
         filename: baseName(f.name) + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: scale, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: 794 },
+        html2canvas: { scale: scale, useCORS: true, backgroundColor: '#ffffff', logging: false, width: PAGE_W, windowWidth: PAGE_W, x: 0, y: 0, scrollX: 0, scrollY: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        pagebreak: { mode: ['css', 'legacy'] }
       };
 
       function cleanup() {

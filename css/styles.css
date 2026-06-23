@@ -258,7 +258,8 @@ body[data-theme="dark"] #btn-theme .ico-moon { display: inline-flex; }
   color: var(--text-soft); font-size: 12.5px; line-height: 1.55; text-align: left;
 }
 .dropzone__privacy svg { font-size: 18px; color: #15803d; flex: 0 0 auto; margin-top: 1px; }
-.dropzone__privacy strong { color: var(--text); }
+.dropzone__privacy span { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.dropzone__privacy strong { color: var(--text); white-space: nowrap; }
 
 /* 문서 컨테이너 */
 .doc {
@@ -532,3 +533,20 @@ body[data-theme="dark"] #btn-theme .ico-moon { display: inline-flex; }
 @media (max-width: 420px) {
   #btn-fontsize { display: none !important; } /* 매우 좁은 화면에선 글자크기 버튼 숨김 */
 }
+
+/* =========================================================================
+   PDF 캡처: 모든 콘텐츠를 페이지 폭 안에 맞춰 우측 잘림/쏠림 방지
+   ========================================================================= */
+.pdf-rendering .markdown-body { width: 100%; box-sizing: border-box; }
+.pdf-rendering .markdown-body * { max-width: 100% !important; }
+.pdf-rendering .markdown-body pre,
+.pdf-rendering .markdown-body code { white-space: pre-wrap !important; word-break: break-word !important; overflow-wrap: anywhere !important; }
+.pdf-rendering .markdown-body pre { overflow: visible !important; }
+.pdf-rendering .table-wrap { overflow: visible !important; }
+.pdf-rendering .markdown-body table { table-layout: fixed !important; width: 100% !important; }
+.pdf-rendering .markdown-body th,
+.pdf-rendering .markdown-body td { word-break: break-word !important; overflow-wrap: anywhere !important; white-space: normal !important; }
+.pdf-rendering .markdown-body img { max-width: 100% !important; height: auto !important; }
+.pdf-rendering .markdown-body h1, .pdf-rendering .markdown-body h2,
+.pdf-rendering .markdown-body h3, .pdf-rendering .markdown-body p,
+.pdf-rendering .markdown-body li { word-break: keep-all; overflow-wrap: anywhere; }

@@ -11,23 +11,6 @@
 - ♿ **접근성** — 키보드 내비게이션, 포커스 표시, 스크린리더 라벨, 44px 터치 타겟
 - 🈚 **인코딩 자동 감지** — UTF-8 우선, 실패 시 EUC-KR/CP949 자동 폴백
 
-## 🚀 GitHub Pages 배포 방법
-
-1. 이 폴더의 **모든 파일**(숨김 파일 `.nojekyll` 포함)을 GitHub 저장소에 올립니다.
-   ```bash
-   git init
-   git add -A          # .nojekyll, vendor/ 등 모두 포함
-   git commit -m "Markdown 뷰어"
-   git branch -M main
-   git remote add origin https://github.com/<사용자명>/<저장소명>.git
-   git push -u origin main
-   ```
-2. 저장소 → **Settings → Pages** 로 이동합니다.
-3. **Source** 를 **Deploy from a branch**, **Branch** 를 `main` / `/ (root)` 으로 지정 후 **Save**.
-4. 잠시 후 `https://<사용자명>.github.io/<저장소명>/` 에서 접속할 수 있습니다.
-
-> `.nojekyll` 이 포함되어 Jekyll 처리 없이 정적 파일이 그대로 서비스됩니다.
-> 모든 경로가 **상대경로(`./`)** 라 사용자/프로젝트 페이지 어디에 배포해도 동작합니다.
 
 ## 🗂 파일 구조
 
