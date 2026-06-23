@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- 보안: 모든 자원을 동일 출처(vendor)에서 로드. 외부 스크립트/연결 차단(이미지·다운로드는 허용) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)" />
+  <meta name="description" content="마크다운(.md) 파일을 깔끔하게 보고 PDF·HWPX로 내보내는 뷰어. 업로드한 파일은 브라우저에서만 처리되어 서버로 전송되지 않습니다." />
+
+  <title>Markdown 뷰어 · MD → PDF · HWPX</title>
+
+  <!-- 아이콘 / PWA -->
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MD 뷰어" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Markdown 뷰어 · MD → PDF · HWPX" />
+  <meta property="og:description" content="마크다운을 깔끔하게 보고 PDF·HWPX로 내보내기. 파일은 브라우저에서만 처리됩니다." />
+  <meta property="og:image" content="./og-image.png" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- 코드 하이라이트 테마 (로컬) -->
+  <link id="hljs-light" rel="stylesheet" href="./vendor/hljs-styles/github.min.css" />
+  <link id="hljs-dark" rel="stylesheet" href="./vendor/hljs-styles/github-dark.min.css" disabled />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body data-theme="light">
+  <!-- 상단 바 -->
+  <header class="appbar">
+    <div class="appbar__left">
+      <button id="btn-menu" class="iconbtn only-mobile" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar" title="메뉴">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="brand">
+        <img class="brand__mark" src="./favicon.svg" width="26" height="26" alt="" />
+        <span class="brand__name">Markdown 뷰어</span>
+      </div>
+    </div>
+
+    <div class="appbar__right">
+      <!-- 내보내기 메뉴 (문서 열렸을 때만) -->
+      <div class="menu-wrap" id="export-actions" hidden>
+        <button id="btn-export" class="btn btn--primary" aria-haspopup="true" aria-expanded="false" aria-controls="export-menu" aria-label="내보내기 메뉴 열기" title="PDF·HWPX·인쇄·원본 내보내기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+          <span>내보내기</span>
+          <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="menu" id="export-menu" hidden aria-label="내보내기">
+          <button class="menu__item" id="mi-pdf">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5z" opacity=".12"/><path d="M14 3v5h5M8 13h8M8 17h5M9 3H5v18h14V8"/></svg>
+            <span><b>PDF로 저장</b><small>그림 기반 · 빠른 한 번 클릭</small></span>
+          </button>
+          <button class="menu__item" id="mi-print">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>
+            <span><b>인쇄 / PDF 저장</b><small>텍스트 선택·검색 가능</small></span>
+            <em class="menu__badge">권장</em>
+          </button>
+          <button class="menu__item" id="mi-hwpx">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13H6z" opacity=".12"/><path d="M14 3v5h5M8 12l1.6 5 1.4-3.2L12.4 17 14 12"/></svg>
+            <span><b>HWPX (한글)</b><small>한컴오피스 한글 문서</small></span>
+          </button>
+          <div class="menu__sep"></div>
+          <button class="menu__item" id="mi-md">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z" opacity=".1"/><path d="M7 15V9l3 3 3-3v6M17 9v4M15 11l2 2 2-2"/></svg>
+            <span><b>원본 .md 다운로드</b><small>업로드한 파일 그대로</small></span>
+          </button>
+        </div>
+      </div>
+
+      <button id="btn-fontsize" class="iconbtn" hidden aria-label="글자 크기 변경" title="글자 크기 (보통/크게/더 크게)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l4-11 4 11M4 14h6"/><path d="M14 17l3-8 3 8M15 14.5h4"/></svg>
+      </button>
+      <button id="btn-newfile" class="iconbtn" hidden aria-label="새 파일 열기" title="새 파일 열기 (Ctrl+O)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14a2 2 0 002-2V8l-6-6H7a2 2 0 00-2 2v14a2 2 0 002 2z" opacity=".12"/><path d="M14 2v6h6M12 11v6M9 14h6"/></svg>
+      </button>
+      <button id="btn-theme" class="iconbtn" aria-label="라이트/다크 테마 전환" title="라이트/다크 전환">
+        <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/></svg>
+      </button>
+    </div>
+    <div class="progress" id="progress" aria-hidden="true"><div class="progress__bar" id="progress-bar"></div></div>
+  </header>
+
+  <div class="layout">
+    <!-- 사이드바 -->
+    <aside class="sidebar" id="sidebar" aria-label="문서 탐색">
+      <div class="sidebar__section">
+        <div class="sidebar__title" id="title-files">파일</div>
+        <ul class="filelist" id="filelist" aria-labelledby="title-files"></ul>
+        <button id="btn-add" class="addfile">＋ 파일 추가</button>
+      </div>
+      <div class="sidebar__section sidebar__toc">
+        <div class="sidebar__title">목차</div>
+        <nav class="toc" id="toc" aria-label="목차"></nav>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <!-- 본문 -->
+    <main class="content" id="content">
+      <!-- 빈 상태 / 업로드 영역 -->
+      <section class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="마크다운 파일 업로드 — 클릭하거나 파일을 끌어다 놓으세요">
+        <div class="dropzone__inner">
+          <div class="dropzone__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5l5 5"/><path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2"/></svg>
+          </div>
+          <h1 class="dropzone__title">마크다운 파일을 여기에 놓으세요</h1>
+          <p class="dropzone__desc">
+            <code>.md</code> · <code>.markdown</code> · <code>.txt</code> 파일을 끌어다 놓거나 아래 버튼으로 선택하세요.
+          </p>
+          <div class="dropzone__btns">
+            <button id="btn-pick" class="btn btn--primary btn--lg">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14a2 2 0 002-2V8l-6-6H7a2 2 0 00-2 2v14a2 2 0 002 2z" opacity=".15"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+              파일 선택
+            </button>
+            <button id="btn-demo" class="btn btn--lg">데모 문서 열기</button>
+          </div>
+          <p class="dropzone__privacy">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" opacity=".12"/><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7zM9 12l2 2 4-4"/></svg>
+            업로드한 파일은 <strong>이 브라우저 안에서만</strong> 처리됩니다. 서버나 외부로 전송·저장되지 않습니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 렌더링된 문서 -->
+      <article class="doc markdown-body" id="doc" hidden></article>
+    </main>
+  </div>
+
+  <!-- 드래그 힌트(뷰어 상태에서 파일 끌어올 때) -->
+  <div class="drophint" id="drophint" hidden aria-hidden="true">
+    <div class="drophint__box">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5l5 5"/><path d="M4 17v2a1 1 0 001 1h14a1 1 0 001-1v-2"/></svg>
+      <span>여기에 놓아 새 파일 열기</span>
+    </div>
+  </div>
+
+  <!-- 숨김 파일 입력 -->
+  <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt,text/markdown,text/plain" multiple hidden />
+
+  <!-- 토스트 -->
+  <div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- 진행 오버레이 -->
+  <div class="overlay" id="overlay" hidden>
+    <div class="overlay__box" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="overlay-msg">처리 중…</p>
+    </div>
+  </div>
+
+  <!-- 라이브러리 (로컬 vendor — 외부 요청 없음) -->
+  <script src="./vendor/marked.min.js"></script>
+  <script src="./vendor/purify.min.js"></script>
+  <script src="./vendor/highlight.min.js"></script>
+  <script src="./vendor/jszip.min.js"></script>
+  <script src="./vendor/html2pdf.bundle.min.js"></script>
+
+  <!-- 앱 스크립트 -->
+  <script src="./js/hwpx.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
