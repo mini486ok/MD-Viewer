@@ -510,68 +510,6 @@
   }
   function toggleExportMenu() { if (dom.exportMenu.hidden) openExportMenu(); else closeExportMenu(); }
 
-  // ── 내보내기: 라이트 테마 강제(다크에서도 흰 배경 출력) ───────────────────────
-  function withLightTheme(fn) {
-    var prev = dom.body.getAttribute('data-theme');
-    applyTheme('light');
-    return Promise.resolve().then(fn).then(
-      function (r) { applyTheme(prev); return r; },
-      function (e) { applyTheme(prev); throw e; });
-  }
-
-  // ── PDF 내보내기 (html2pdf) ─────────────────────────────────────────────────
-  function exportPDF() {
-    var f = activeFile(); if (!f) return;
-    closeExportMenu();
-    if (typeof html2pdf === 'undefined') { toast('PDF 라이브러리를 불러오지 못했습니다.', 'error'); return; }
-    showOverlay('PDF 만드는 중… 문서가 길면 시간이 걸릴 수 있습니다.');
-
-    withLightTheme(function () {
-      var PAGE_W = 800; // 캡처 폭(px). 모든 콘텐츠를 이 폭 안에 맞춰 우측 잘림 방지
-      var holder = document.createElement('div');
-      // 화면 밖(left:-99999px)에 두면 html2canvas가 x오프셋을 잘못 잡아 좌측이 잘림 →
-      // 좌상단에 두되 진행 오버레이(z-index 70)로 가린다.
-      holder.style.cssText = 'position:fixed;left:0;top:0;z-index:1;width:' + PAGE_W + 'px;background:#fff;';
-      holder.className = 'pdf-rendering';
-      var page = document.createElement('div');
-      page.className = 'markdown-body';
-      page.style.cssText = 'width:' + PAGE_W + 'px;padding:0;background:#fff;color:#1f2328;font-size:15px;line-height:1.75;box-sizing:border-box;';
-
-      var head = document.createElement('div');
-      head.style.cssText = 'margin:0 0 20px;padding-bottom:12px;border-bottom:1.5px solid #222;';
-      head.innerHTML = '<div style="font-size:21px;font-weight:800;letter-spacing:-.02em;"></div>' +
-        '<div style="font-size:11px;color:#666;margin-top:5px;">Markdown 뷰어 · ' + formatDate(new Date()) + '</div>';
-      head.querySelector('div').textContent = baseName(f.name);
-
-      page.appendChild(head);
-      var clone = dom.doc.cloneNode(true);
-      while (clone.firstChild) page.appendChild(clone.firstChild);
-      holder.appendChild(page);
-      document.body.appendChild(holder);
-
-      var scale = isMobile() ? 1.5 : 2;
-      var opt = {
-        margin: [13, 13, 14, 13],   // 상우하좌(mm) 대칭 여백 → 중앙 배치
-        filename: baseName(f.name) + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: scale, useCORS: true, backgroundColor: '#ffffff', logging: false, width: PAGE_W, windowWidth: PAGE_W, x: 0, y: 0, scrollX: 0, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
-      };
-
-      function cleanup() {
-        holder.remove();
-        Array.prototype.forEach.call(document.querySelectorAll('.html2pdf__overlay, .html2pdf__container'), function (n) { n.remove(); });
-      }
-      return html2pdf().set(opt).from(page).save().then(function () {
-        cleanup(); hideOverlay(); toast('PDF 파일을 저장했습니다.', 'ok');
-      }).catch(function (err) {
-        cleanup(); hideOverlay(); console.error(err);
-        toast('PDF 생성에 실패했습니다. "인쇄 / PDF 저장"을 이용해 보세요.', 'error');
-      });
-    });
-  }
-
   // ── 인쇄 (네이티브 → PDF 저장 가능, 텍스트 선택 가능) ────────────────────────
   var printing = false;
   function printDoc() {
@@ -644,7 +582,6 @@
 
     // 내보내기 메뉴
     dom.btnExport.addEventListener('click', function (e) { e.stopPropagation(); toggleExportMenu(); });
-    $('mi-pdf').addEventListener('click', exportPDF);
     $('mi-print').addEventListener('click', printDoc);
     $('mi-hwpx').addEventListener('click', exportHWPX);
     $('mi-md').addEventListener('click', downloadMD);

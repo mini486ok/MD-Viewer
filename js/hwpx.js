@@ -451,7 +451,7 @@
   function buildHeader() {
     // 기존 base 의 charPr 0~6 (그대로 사용)
     var baseChar0_6 =
-      charPr(0, 1000, 1, '#000000', {}) +
+      charPr(0, 1050, 1, '#1A1A1A', {}) +
       charPr(1, 1000, 0, '#000000', {}) +
       charPr(2, 900, 0, '#000000', {}) +
       charPr(3, 900, 1, '#000000', {}) +
@@ -460,21 +460,21 @@
       charPr(6, 1100, 0, '#000000', {});
     // 확장 charPr 7~21
     var extChar =
-      charPr(CP.BOLD, 1000, 1, '#000000', { bold: true }) +
-      charPr(CP.ITALIC, 1000, 1, '#000000', { italic: true }) +
-      charPr(CP.BOLD_ITALIC, 1000, 1, '#000000', { bold: true, italic: true }) +
+      charPr(CP.BOLD, 1050, 1, '#1A1A1A', { bold: true }) +
+      charPr(CP.ITALIC, 1050, 1, '#1A1A1A', { italic: true }) +
+      charPr(CP.BOLD_ITALIC, 1050, 1, '#1A1A1A', { bold: true, italic: true }) +
       charPr(CP.CODE, 1000, 0, '#C7254E', { shade: '#F2EEF0' }) +
-      charPr(CP.CODE_BLOCK, 960, 0, '#24292E', {}) +
-      charPr(CP.H1, 1900, 0, '#1A1A1A', { bold: true }) +
-      charPr(CP.H2, 1600, 0, '#1A1A1A', { bold: true }) +
-      charPr(CP.H3, 1350, 0, '#1A1A1A', { bold: true }) +
-      charPr(CP.H4, 1200, 0, '#333333', { bold: true }) +
-      charPr(CP.H5, 1080, 0, '#333333', { bold: true }) +
-      charPr(CP.H6, 1000, 0, '#6A737D', { bold: true }) +
-      charPr(CP.LINK, 1000, 1, '#2563EB', { underline: true, underlineColor: '#2563EB' }) +
-      charPr(CP.STRIKE, 1000, 1, '#000000', { strike: true }) +
-      charPr(CP.TH, 1000, 0, '#1A1A1A', { bold: true }) +
-      charPr(CP.QUOTE, 1000, 1, '#57606A', { italic: true });
+      charPr(CP.CODE_BLOCK, 980, 0, '#24292E', {}) +
+      charPr(CP.H1, 2000, 0, '#111111', { bold: true }) +
+      charPr(CP.H2, 1650, 0, '#1A1A1A', { bold: true }) +
+      charPr(CP.H3, 1400, 0, '#1A1A1A', { bold: true }) +
+      charPr(CP.H4, 1250, 0, '#24292E', { bold: true }) +
+      charPr(CP.H5, 1150, 0, '#24292E', { bold: true }) +
+      charPr(CP.H6, 1080, 0, '#57606A', { bold: true }) +
+      charPr(CP.LINK, 1050, 1, '#2563EB', { underline: true, underlineColor: '#2563EB' }) +
+      charPr(CP.STRIKE, 1050, 1, '#1A1A1A', { strike: true }) +
+      charPr(CP.TH, 1050, 0, '#1A1A1A', { bold: true }) +
+      charPr(CP.QUOTE, 1050, 1, '#57606A', { italic: true });
     var charProps = '<hh:charProperties itemCnt="22">' + baseChar0_6 + extChar + '</hh:charProperties>';
 
     // borderFill 1,2 (base) + 3~6 (확장)
@@ -502,26 +502,26 @@
     // 단순화를 위해 base paraPr 0~19 중 본 모듈이 참조하는 0 만 base 동일하게 두고,
     // 나머지(1~19)도 형태 유지를 위해 생성한다(스타일 참조 정합성 유지).
     var baseParas = '';
-    // paraPr 0: 본문 기본 — 줄간격 175%, 문단 뒤 여백(읽기 편한 리듬)
-    baseParas += paraPr(0, { align: 'JUSTIFY', line: 175, next: 250 });
+    // paraPr 0: 본문 기본 — 줄간격 185%, 문단 뒤 여백(읽기 편한 리듬)
+    baseParas += paraPr(0, { align: 'JUSTIFY', line: 185, next: 320 });
     // 1~19: base 와 동일 의미를 갖도록 최소 형태로 생성(미사용이지만 styles 참조 충족)
     for (var p = 1; p <= 19; p++) {
       baseParas += paraPr(p, { align: 'JUSTIFY', line: 160 });
     }
-    // 확장 20~31
+    // 확장 20~31 — 제목 위/아래 여백을 넉넉히(제목↔내용 간격 확대)
     var extParas =
-      paraPr(PP.HEADING, { align: 'LEFT', line: 150, prev: 450, next: 160 }) +          // H3~H6
-      paraPr(PP.CODE, { align: 'LEFT', line: 135 }) +
-      paraPr(PP.QUOTE, { align: 'JUSTIFY', line: 165, left: 700, prev: 100, next: 130 }) +
-      paraPr(PP.LIST1, { align: 'JUSTIFY', line: 165, left: 700, intent: -350, next: 60 }) +
-      paraPr(PP.LIST2, { align: 'JUSTIFY', line: 165, left: 1400, intent: -350, next: 60 }) +
-      paraPr(PP.LIST3, { align: 'JUSTIFY', line: 165, left: 2100, intent: -350, next: 60 }) +
-      paraPr(PP.TD_LEFT, { align: 'LEFT', line: 135 }) +
-      paraPr(PP.TD_CENTER, { align: 'CENTER', line: 135 }) +
-      paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 135 }) +
-      paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 250, next: 250, bf: BF.HR }) +
-      paraPr(PP.H1, { align: 'LEFT', line: 140, prev: 650, next: 260, bf: BF.H1_UL, borderOffsetBottom: 200 }) +
-      paraPr(PP.H2, { align: 'LEFT', line: 145, prev: 520, next: 210, bf: BF.H2_UL, borderOffsetBottom: 150 });
+      paraPr(PP.HEADING, { align: 'LEFT', line: 158, prev: 520, next: 320 }) +          // H3~H6
+      paraPr(PP.CODE, { align: 'LEFT', line: 145 }) +
+      paraPr(PP.QUOTE, { align: 'JUSTIFY', line: 175, left: 750, prev: 180, next: 220 }) +
+      paraPr(PP.LIST1, { align: 'JUSTIFY', line: 178, left: 750, intent: -380, next: 90 }) +
+      paraPr(PP.LIST2, { align: 'JUSTIFY', line: 178, left: 1480, intent: -380, next: 90 }) +
+      paraPr(PP.LIST3, { align: 'JUSTIFY', line: 178, left: 2210, intent: -380, next: 90 }) +
+      paraPr(PP.TD_LEFT, { align: 'LEFT', line: 145 }) +
+      paraPr(PP.TD_CENTER, { align: 'CENTER', line: 145 }) +
+      paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 145 }) +
+      paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 320, next: 320, bf: BF.HR }) +
+      paraPr(PP.H1, { align: 'LEFT', line: 150, prev: 820, next: 520, bf: BF.H1_UL, borderOffsetBottom: 300 }) +
+      paraPr(PP.H2, { align: 'LEFT', line: 152, prev: 660, next: 440, bf: BF.H2_UL, borderOffsetBottom: 230 });
     var paraProps = '<hh:paraProperties itemCnt="32">' + baseParas + extParas + '</hh:paraProperties>';
 
     return HEADER_PREFIX + borderFills + charProps + HEADER_MID + paraProps + HEADER_SUFFIX;

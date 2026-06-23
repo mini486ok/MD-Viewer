@@ -53,24 +53,20 @@
     <div class="appbar__right">
       <!-- 내보내기 메뉴 (문서 열렸을 때만) -->
       <div class="menu-wrap" id="export-actions" hidden>
-        <button id="btn-export" class="btn btn--primary" aria-haspopup="true" aria-expanded="false" aria-controls="export-menu" aria-label="내보내기 메뉴 열기" title="PDF·HWPX·인쇄·원본 내보내기">
+        <button id="btn-export" class="btn btn--primary" aria-haspopup="true" aria-expanded="false" aria-controls="export-menu" aria-label="내보내기 메뉴 열기" title="HWPX·인쇄·원본 내보내기">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
           <span>내보내기</span>
           <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="menu" id="export-menu" hidden aria-label="내보내기">
-          <button class="menu__item" id="mi-pdf">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5z" opacity=".12"/><path d="M14 3v5h5M8 13h8M8 17h5M9 3H5v18h14V8"/></svg>
-            <span><b>PDF로 저장</b><small>그림 기반 · 빠른 한 번 클릭</small></span>
-          </button>
-          <button class="menu__item" id="mi-print">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>
-            <span><b>인쇄 / PDF 저장</b><small>텍스트 선택·검색 가능</small></span>
-            <em class="menu__badge">권장</em>
-          </button>
           <button class="menu__item" id="mi-hwpx">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13H6z" opacity=".12"/><path d="M14 3v5h5M8 12l1.6 5 1.4-3.2L12.4 17 14 12"/></svg>
             <span><b>HWPX (한글)</b><small>한컴오피스 한글 문서</small></span>
+            <em class="menu__badge">권장</em>
+          </button>
+          <button class="menu__item" id="mi-print">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>
+            <span><b>인쇄</b><small>브라우저 인쇄 대화상자</small></span>
           </button>
           <div class="menu__sep"></div>
           <button class="menu__item" id="mi-md">
@@ -167,7 +163,6 @@
   <script src="./vendor/purify.min.js"></script>
   <script src="./vendor/highlight.min.js"></script>
   <script src="./vendor/jszip.min.js"></script>
-  <script src="./vendor/html2pdf.bundle.min.js"></script>
 
   <!-- 앱 스크립트 -->
   <script src="./js/hwpx.js"></script>

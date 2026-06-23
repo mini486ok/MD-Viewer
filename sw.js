@@ -1,5 +1,5 @@
 /* sw.js — 앱 셸 + 라이브러리 오프라인 캐시 (정적 자산만, 사용자 업로드 문서는 캐시하지 않음) */
-const CACHE = 'md-viewer-v3';
+const CACHE = 'md-viewer-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -9,7 +9,6 @@ const ASSETS = [
   './vendor/marked.min.js',
   './vendor/purify.min.js',
   './vendor/jszip.min.js',
-  './vendor/html2pdf.bundle.min.js',
   './vendor/highlight.min.js',
   './vendor/hljs-styles/github.min.css',
   './vendor/hljs-styles/github-dark.min.css',
