@@ -33,7 +33,7 @@
     H1: 30, H2: 31   // 밑줄(하단 테두리) 포함 제목용
   };
   // BorderFill ID 맵
-  var BF = { NONE: 2, CELL: 3, TH: 4, CODE: 5, HR: 6, H1_UL: 7, H2_UL: 8 };
+  var BF = { NONE: 2, CELL: 3, TH: 4, CODE: 5, HR: 6 };
 
   var HEAD_CP = [CP.H1, CP.H2, CP.H3, CP.H4, CP.H5, CP.H6];
 
@@ -489,13 +489,11 @@
       '<hh:topBorder type="NONE" width="0.1 mm" color="#000000"/><hh:bottomBorder type="NONE" width="0.1 mm" color="#000000"/>' +
       '<hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/>' +
       '<hc:fillBrush><hc:winBrush faceColor="none" hatchColor="#999999" alpha="0"/></hc:fillBrush></hh:borderFill>';
-    var borderFills = '<hh:borderFills itemCnt="8">' + bf1 + bf2 +
+    var borderFills = '<hh:borderFills itemCnt="6">' + bf1 + bf2 +
       borderFill(BF.CELL, { l: true, r: true, t: true, b: true }, null) +
       borderFill(BF.TH, { l: true, r: true, t: true, b: true }, '#EEF1F5') +
       borderFill(BF.CODE, { l: true, r: true, t: true, b: true }, '#F6F8FA') +
       borderFill(BF.HR, { l: false, r: false, t: false, b: true }, null) +
-      borderFill(BF.H1_UL, { l: false, r: false, t: false, b: true }, null, { width: '0.4 mm', color: '#2E2E2E' }) +
-      borderFill(BF.H2_UL, { l: false, r: false, t: false, b: true }, null, { width: '0.15 mm', color: '#C8CDD3' }) +
       '</hh:borderFills>';
 
     // base paraPr 0~19 는 별도 정의가 필요 없으나, 본문은 0 만 사용.
@@ -520,9 +518,9 @@
       paraPr(PP.TD_CENTER, { align: 'CENTER', line: 145 }) +
       paraPr(PP.TD_RIGHT, { align: 'RIGHT', line: 145 }) +
       paraPr(PP.HR, { align: 'JUSTIFY', line: 100, prev: 320, next: 320, bf: BF.HR }) +
-      // 밑줄은 제목 글자에 가깝게(borderOffsetBottom 작게), 내용은 밑줄에서 넉넉히 띄움(next 크게)
-      paraPr(PP.H1, { align: 'LEFT', line: 150, prev: 820, next: 720, bf: BF.H1_UL, borderOffsetBottom: 300 }) +
-      paraPr(PP.H2, { align: 'LEFT', line: 152, prev: 660, next: 600, bf: BF.H2_UL, borderOffsetBottom: 250 });
+      // 제목/소제목: 밑줄 없이, 위/아래 여백을 넉넉히(제목↔내용 간격 확보)
+      paraPr(PP.H1, { align: 'LEFT', line: 150, prev: 820, next: 600 }) +
+      paraPr(PP.H2, { align: 'LEFT', line: 152, prev: 660, next: 500 });
     var paraProps = '<hh:paraProperties itemCnt="32">' + baseParas + extParas + '</hh:paraProperties>';
 
     return HEADER_PREFIX + borderFills + charProps + HEADER_MID + paraProps + HEADER_SUFFIX;

@@ -518,9 +518,17 @@
     printing = true;
     closeExportMenu();
     var prev = dom.body.getAttribute('data-theme');
+    var prevTitle = document.title;
+    // 인쇄→PDF 저장 시 기본 파일명은 document.title 을 따르므로 원본 파일명으로 교체
+    document.title = baseName(f.name);
     applyTheme('light');
     var restored = false;
-    var restore = function () { if (restored) return; restored = true; printing = false; applyTheme(prev); window.removeEventListener('afterprint', restore); };
+    var restore = function () {
+      if (restored) return; restored = true; printing = false;
+      applyTheme(prev);
+      document.title = prevTitle;
+      window.removeEventListener('afterprint', restore);
+    };
     window.addEventListener('afterprint', restore, { once: true });
     setTimeout(function () { window.print(); setTimeout(restore, 1500); }, 60);
   }
